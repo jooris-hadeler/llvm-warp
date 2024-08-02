@@ -9,18 +9,18 @@ use llvm_sys::{
         LLVMBuildICmp, LLVMBuildLoad2, LLVMBuildMul, LLVMBuildNeg, LLVMBuildNot, LLVMBuildOr,
         LLVMBuildRet, LLVMBuildRetVoid, LLVMBuildSDiv, LLVMBuildSExt, LLVMBuildSIToFP,
         LLVMBuildSRem, LLVMBuildStore, LLVMBuildSub, LLVMBuildUDiv, LLVMBuildUIToFP, LLVMBuildURem,
-        LLVMBuildZExt, LLVMConstInt, LLVMDisposeBuilder, LLVMPositionBuilder,
+        LLVMBuildZExt, LLVMConstInt, LLVMDisposeBuilder, LLVMGetInsertBlock, LLVMPositionBuilder,
         LLVMPositionBuilderAtEnd, LLVMPositionBuilderBefore,
     },
     prelude::{LLVMBuilderRef, LLVMValueRef},
-    LLVMOpcode,
+    LLVMIntPredicate, LLVMOpcode, LLVMRealPredicate,
 };
 
 use crate::{
     basic_block::BasicBlock,
     ty::Type,
     util::{string_to_cstring, EMPTY_TWINE},
-    value::{IntPredicate, RealPredicate, Value},
+    value::Value,
 };
 
 #[derive(Debug, Clone)]
@@ -52,6 +52,11 @@ impl Builder {
     /// Position the builder at the end of a [`BasicBlockRef`].
     pub fn position_at_end(&self, block: &BasicBlock) {
         unsafe { LLVMPositionBuilderAtEnd(self.get(), block.get()) }
+    }
+
+    /// Get insertion block.
+    pub fn get_insert_block(&self) -> BasicBlock {
+        unsafe { BasicBlock::new(LLVMGetInsertBlock(self.get())) }
     }
 
     /// Build an `Add` instruction.
@@ -139,11 +144,11 @@ impl Builder {
     }
 
     /// Build an `ICmp` instruction.
-    pub fn build_icmp(&self, op: IntPredicate, left: &Value, right: &Value) -> Value {
+    pub fn build_icmp(&self, op: LLVMIntPredicate, left: &Value, right: &Value) -> Value {
         unsafe {
             Value::new(LLVMBuildICmp(
                 self.get(),
-                op.into(),
+                op,
                 left.get(),
                 right.get(),
                 EMPTY_TWINE.as_ptr(),
@@ -200,11 +205,11 @@ impl Builder {
     }
 
     /// Build a `FCmp` instruction.
-    pub fn build_fcmp(&self, predicate: RealPredicate, left: &Value, right: &Value) -> Value {
+    pub fn build_fcmp(&self, predicate: LLVMRealPredicate, left: &Value, right: &Value) -> Value {
         unsafe {
             Value::new(LLVMBuildFCmp(
                 self.get(),
-                predicate.into(),
+                predicate,
                 left.get(),
                 right.get(),
                 EMPTY_TWINE.as_ptr(),

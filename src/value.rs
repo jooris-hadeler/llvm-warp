@@ -2,9 +2,9 @@ use std::ptr::null_mut;
 
 use llvm_sys::{
     analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction},
-    core::{LLVMGetParam, LLVMSetLinkage, LLVMTypeOf},
+    core::{LLVMDeleteFunction, LLVMGetParam, LLVMSetLinkage, LLVMTypeOf},
     prelude::*,
-    LLVMIntPredicate, LLVMLinkage, LLVMRealPredicate,
+    LLVMLinkage,
 };
 
 use crate::ty::Type;
@@ -44,6 +44,11 @@ impl Value {
     pub fn verify_function(&self, action: VerifierFailureAction) -> bool {
         unsafe { LLVMVerifyFunction(self.get(), action.into()) != 1 }
     }
+
+    /// Delete this function.
+    pub fn delete_function(&self) {
+        unsafe { LLVMDeleteFunction(self.get()) };
+    }
 }
 
 /// A list of actions if a verification fails.
@@ -60,82 +65,6 @@ impl From<VerifierFailureAction> for LLVMVerifierFailureAction {
             VerifierFailureAction::AbortProcess => Self::LLVMAbortProcessAction,
             VerifierFailureAction::PrintMessage => Self::LLVMPrintMessageAction,
             VerifierFailureAction::ReturnStatus => Self::LLVMReturnStatusAction,
-        }
-    }
-}
-
-/// Predicate for Integer comparisions.
-#[derive(Debug, Clone, Copy)]
-pub enum IntPredicate {
-    Eq,
-    Ne,
-    UGt,
-    UGe,
-    ULt,
-    ULe,
-    SGt,
-    SGe,
-    SLt,
-    SLe,
-}
-
-impl From<IntPredicate> for LLVMIntPredicate {
-    fn from(value: IntPredicate) -> Self {
-        match value {
-            IntPredicate::Eq => Self::LLVMIntEQ,
-            IntPredicate::Ne => Self::LLVMIntNE,
-            IntPredicate::UGt => Self::LLVMIntUGT,
-            IntPredicate::UGe => Self::LLVMIntUGE,
-            IntPredicate::ULt => Self::LLVMIntULT,
-            IntPredicate::ULe => Self::LLVMIntULE,
-            IntPredicate::SGt => Self::LLVMIntSGT,
-            IntPredicate::SGe => Self::LLVMIntSGE,
-            IntPredicate::SLt => Self::LLVMIntSLT,
-            IntPredicate::SLe => Self::LLVMIntSLE,
-        }
-    }
-}
-
-/// Predicate for Real comparisions.
-#[derive(Debug, Clone, Copy)]
-pub enum RealPredicate {
-    PredicateFalse,
-    OEq,
-    OGt,
-    OGe,
-    OLt,
-    OLe,
-    ONe,
-    ORd,
-    UNo,
-    UEq,
-    UGt,
-    UGe,
-    ULt,
-    ULe,
-    UNe,
-    PredicateTrue,
-}
-
-impl From<RealPredicate> for LLVMRealPredicate {
-    fn from(value: RealPredicate) -> Self {
-        match value {
-            RealPredicate::PredicateFalse => Self::LLVMRealPredicateFalse,
-            RealPredicate::OEq => Self::LLVMRealOEQ,
-            RealPredicate::OGt => Self::LLVMRealOGT,
-            RealPredicate::OGe => Self::LLVMRealOGE,
-            RealPredicate::OLt => Self::LLVMRealOLT,
-            RealPredicate::OLe => Self::LLVMRealOLE,
-            RealPredicate::ONe => Self::LLVMRealONE,
-            RealPredicate::ORd => Self::LLVMRealORD,
-            RealPredicate::UNo => Self::LLVMRealUNO,
-            RealPredicate::UEq => Self::LLVMRealUEQ,
-            RealPredicate::UGt => Self::LLVMRealUGT,
-            RealPredicate::UGe => Self::LLVMRealUGE,
-            RealPredicate::ULt => Self::LLVMRealULT,
-            RealPredicate::ULe => Self::LLVMRealULE,
-            RealPredicate::UNe => Self::LLVMRealUNE,
-            RealPredicate::PredicateTrue => Self::LLVMRealPredicateTrue,
         }
     }
 }

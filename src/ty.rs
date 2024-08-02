@@ -29,7 +29,7 @@ impl Type {
     }
 
     /// Get [`TypeKind`] of this [`Type`].
-    pub fn get_type_kind(&self) -> TypeKind {
+    pub fn get_type_kind(&self) -> LLVMTypeKind {
         unsafe { LLVMGetTypeKind(self.get()).into() }
     }
 
@@ -98,87 +98,6 @@ impl Type {
     /// Is pointer opaque.
     pub fn is_pointer_opaque(&self) -> bool {
         unsafe { LLVMPointerTypeIsOpaque(self.get()) == 1 }
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
-pub enum TypeKind {
-    Void,
-    Half,
-    Float,
-    Double,
-    X86Fp80,
-    FP128,
-    PpcFp128,
-    Label,
-    Integer,
-    Function,
-    Struct,
-    Array,
-    Pointer,
-    Vector,
-    Metadata,
-    X86Mmx,
-    Token,
-    ScalableVector,
-    BFloat,
-    X86Amx,
-    TargetExt,
-}
-
-impl From<LLVMTypeKind> for TypeKind {
-    fn from(value: LLVMTypeKind) -> Self {
-        match value {
-            LLVMTypeKind::LLVMVoidTypeKind => Self::Void,
-            LLVMTypeKind::LLVMHalfTypeKind => Self::Half,
-            LLVMTypeKind::LLVMFloatTypeKind => Self::Float,
-            LLVMTypeKind::LLVMDoubleTypeKind => Self::Double,
-            LLVMTypeKind::LLVMX86_FP80TypeKind => Self::X86Fp80,
-            LLVMTypeKind::LLVMFP128TypeKind => Self::FP128,
-            LLVMTypeKind::LLVMPPC_FP128TypeKind => Self::PpcFp128,
-            LLVMTypeKind::LLVMLabelTypeKind => Self::Label,
-            LLVMTypeKind::LLVMIntegerTypeKind => Self::Integer,
-            LLVMTypeKind::LLVMFunctionTypeKind => Self::Function,
-            LLVMTypeKind::LLVMStructTypeKind => Self::Struct,
-            LLVMTypeKind::LLVMArrayTypeKind => Self::Array,
-            LLVMTypeKind::LLVMPointerTypeKind => Self::Pointer,
-            LLVMTypeKind::LLVMVectorTypeKind => Self::Vector,
-            LLVMTypeKind::LLVMMetadataTypeKind => Self::Metadata,
-            LLVMTypeKind::LLVMX86_MMXTypeKind => Self::X86Mmx,
-            LLVMTypeKind::LLVMTokenTypeKind => Self::Token,
-            LLVMTypeKind::LLVMScalableVectorTypeKind => Self::ScalableVector,
-            LLVMTypeKind::LLVMBFloatTypeKind => Self::BFloat,
-            LLVMTypeKind::LLVMX86_AMXTypeKind => Self::X86Amx,
-            LLVMTypeKind::LLVMTargetExtTypeKind => Self::TargetExt,
-        }
-    }
-}
-
-impl From<TypeKind> for LLVMTypeKind {
-    fn from(value: TypeKind) -> Self {
-        match value {
-            TypeKind::Void => Self::LLVMVoidTypeKind,
-            TypeKind::Half => Self::LLVMHalfTypeKind,
-            TypeKind::Float => Self::LLVMFloatTypeKind,
-            TypeKind::Double => Self::LLVMDoubleTypeKind,
-            TypeKind::X86Fp80 => Self::LLVMX86_FP80TypeKind,
-            TypeKind::FP128 => Self::LLVMFP128TypeKind,
-            TypeKind::PpcFp128 => Self::LLVMPPC_FP128TypeKind,
-            TypeKind::Label => Self::LLVMLabelTypeKind,
-            TypeKind::Integer => Self::LLVMIntegerTypeKind,
-            TypeKind::Function => Self::LLVMFunctionTypeKind,
-            TypeKind::Struct => Self::LLVMStructTypeKind,
-            TypeKind::Array => Self::LLVMArrayTypeKind,
-            TypeKind::Pointer => Self::LLVMPointerTypeKind,
-            TypeKind::Vector => Self::LLVMVectorTypeKind,
-            TypeKind::Metadata => Self::LLVMMetadataTypeKind,
-            TypeKind::X86Mmx => Self::LLVMX86_MMXTypeKind,
-            TypeKind::Token => Self::LLVMTokenTypeKind,
-            TypeKind::ScalableVector => Self::LLVMScalableVectorTypeKind,
-            TypeKind::BFloat => Self::LLVMBFloatTypeKind,
-            TypeKind::X86Amx => Self::LLVMX86_AMXTypeKind,
-            TypeKind::TargetExt => Self::LLVMTargetExtTypeKind,
-        }
     }
 }
 

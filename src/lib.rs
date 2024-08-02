@@ -2,6 +2,7 @@ pub mod basic_block;
 pub mod builder;
 pub mod context;
 pub mod module;
+pub mod target;
 pub mod ty;
 mod util;
 pub mod value;
