@@ -2,9 +2,9 @@ use std::ptr::null_mut;
 
 use llvm_sys::{
     analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction},
-    core::LLVMTypeOf,
+    core::{LLVMGetParam, LLVMSetLinkage, LLVMTypeOf},
     prelude::*,
-    LLVMIntPredicate, LLVMRealPredicate,
+    LLVMIntPredicate, LLVMLinkage, LLVMRealPredicate,
 };
 
 use crate::ty::Type;
@@ -23,6 +23,16 @@ impl Value {
     /// Get inner [`LLVMValueRef`].
     pub(crate) fn get(&self) -> LLVMValueRef {
         self.0
+    }
+
+    /// Get function parameter [`Value`].
+    pub fn get_param(&self, index: usize) -> Value {
+        unsafe { Value::new(LLVMGetParam(self.get(), index as u32)) }
+    }
+
+    /// Set the linkage of a Function.
+    pub fn set_linkage(&self, linkage: LLVMLinkage) {
+        unsafe { LLVMSetLinkage(self.get(), linkage) }
     }
 
     /// Get [`Type`] of the current [`Value`].

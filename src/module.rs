@@ -2,7 +2,7 @@ use std::ptr::null_mut;
 
 use llvm_sys::{
     bit_writer::LLVMWriteBitcodeToFile,
-    core::{LLVMAddFunction, LLVMDisposeModule},
+    core::{LLVMAddFunction, LLVMDisposeModule, LLVMSetTarget},
     prelude::LLVMModuleRef,
 };
 
@@ -21,6 +21,13 @@ impl Module {
     /// Get the inner [`LLVMModuleRef`].
     pub(crate) fn get(&self) -> LLVMModuleRef {
         self.0
+    }
+
+    /// Set module target.
+    pub fn set_target(&self, target_triple: String) {
+        let target = string_to_cstring(target_triple);
+
+        unsafe { LLVMSetTarget(self.get(), target.as_ptr()) }
     }
 
     /// Add a new function to this [`Module`].
